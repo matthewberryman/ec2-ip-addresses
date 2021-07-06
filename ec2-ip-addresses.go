@@ -72,6 +72,11 @@ func main() {
 				if i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicIp != nil {
 					fmt.Println("   " + *i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicIp)
 				}
+				if i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Ipv6Addresses != nil {
+					for _, ipv6 := range i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Ipv6Addresses {
+						fmt.Println(ipv6)
+					}
+				}
 			} else {
 				fmt.Println("   " + "offline")
 			}
