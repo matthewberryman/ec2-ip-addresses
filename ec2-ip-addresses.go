@@ -23,7 +23,16 @@ func main() {
 
 	client := ec2.NewFromConfig(cfg)
 
-	input := &ec2.DescribeInstancesInput{}
+	input := &ec2.DescribeInstancesInput{
+		Filters: []types.Filter{
+			{
+				Name: aws.String("instance-state-name"),
+				Values: []string{
+					"running",
+				},
+			},
+		},
+	}
 
 	if *tagPtr != "" {
 		input = &ec2.DescribeInstancesInput{
@@ -32,6 +41,12 @@ func main() {
 					Name: aws.String("tag-value"),
 					Values: []string{
 						*tagPtr,
+					},
+				},
+				{
+					Name: aws.String("instance-state-name"),
+					Values: []string{
+						"running",
 					},
 				},
 			},
@@ -50,8 +65,16 @@ func main() {
 		fmt.Println("Instance IDs:")
 		for _, i := range r.Instances {
 			fmt.Println("   " + *i.InstanceId)
-			fmt.Println("   " + *i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicDnsName)
-			fmt.Println("   " + *i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicIp)
+			if i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association != nil {
+				if i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicDnsName != nil {
+					fmt.Println("   " + *i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicDnsName)
+				}
+				if i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicIp != nil {
+					fmt.Println("   " + *i.NetworkInterfaces[len(i.NetworkInterfaces)-1].Association.PublicIp)
+				}
+			} else {
+				fmt.Println("   " + "offline")
+			}
 		}
 
 		fmt.Println("")
